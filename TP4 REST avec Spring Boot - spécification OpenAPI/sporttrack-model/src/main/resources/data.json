@@ -1,0 +1,182 @@
+[
+  {
+    "date": "03/01/2023",
+    "freq_max": 103,
+    "distance": 770,
+    "data": [
+      {
+        "time": "13:00:00",
+        "cardio_frequency": 99,
+        "latitude": 47.644795,
+        "longitude": -2.776605,
+        "altitude": 18
+      },
+      {
+        "time": "13:00:05",
+        "cardio_frequency": 100,
+        "latitude": 47.64687,
+        "longitude": -2.778911,
+        "altitude": 18
+      },
+      {
+        "time": "13:00:10",
+        "cardio_frequency": 102,
+        "latitude": 47.646197,
+        "longitude": -2.78022,
+        "altitude": 18
+      }
+    ],
+    "freq_min": 98,
+    "description": "IUT RU"
+  },
+  {
+    "date": "04/01/2023",
+    "freq_max": 110,
+    "distance": 850,
+    "data": [
+      {
+        "time": "08:15:00",
+        "cardio_frequency": 105,
+        "latitude": 47.660123,
+        "longitude": -2.782456,
+        "altitude": 22
+      },
+      {
+        "time": "08:15:05",
+        "cardio_frequency": 107,
+        "latitude": 47.661345,
+        "longitude": -2.783567,
+        "altitude": 22
+      },
+      {
+        "time": "08:15:10",
+        "cardio_frequency": 110,
+        "latitude": 47.661876,
+        "longitude": -2.784678,
+        "altitude": 22
+      }
+    ],
+    "freq_min": 104,
+    "description": "Morning Jog"
+  },
+  {
+    "date": "05/01/2023",
+    "freq_max": 116,
+    "distance": 1500,
+    "data": [
+      {
+        "time": "10:00:00",
+        "cardio_frequency": 110,
+        "latitude": 47.640000,
+        "longitude": -2.770000,
+        "altitude": 25
+      },
+      {
+        "time": "10:00:15",
+        "cardio_frequency": 112,
+        "latitude": 47.641234,
+        "longitude": -2.771234,
+        "altitude": 25
+      },
+      {
+        "time": "10:00:30",
+        "cardio_frequency": 116,
+        "latitude": 47.642345,
+        "longitude": -2.772345,
+        "altitude": 30
+      }
+    ],
+    "freq_min": 108,
+    "description": "Park Run"
+  },
+  {
+    "date": "06/01/2023",
+    "freq_max": 98,
+    "distance": 600,
+    "data": [
+      {
+        "time": "18:00:00",
+        "cardio_frequency": 92,
+        "latitude": 47.650001,
+        "longitude": -2.780123,
+        "altitude": 20
+      },
+      {
+        "time": "18:00:10",
+        "cardio_frequency": 95,
+        "latitude": 47.651456,
+        "longitude": -2.781345,
+        "altitude": 20
+      },
+      {
+        "time": "18:00:20",
+        "cardio_frequency": 98,
+        "latitude": 47.652789,
+        "longitude": -2.782678,
+        "altitude": 20
+      }
+    ],
+    "freq_min": 91,
+    "description": "Evening Stroll"
+  },
+  {
+    "date": "07/01/2023",
+    "freq_max": 125,
+    "distance": 2000,
+    "data": [
+      {
+        "time": "07:30:00",
+        "cardio_frequency": 120,
+        "latitude": 47.670001,
+        "longitude": -2.790123,
+        "altitude": 15
+      },
+      {
+        "time": "07:30:20",
+        "cardio_frequency": 123,
+        "latitude": 47.671234,
+        "longitude": -2.791345,
+        "altitude": 15
+      },
+      {
+        "time": "07:30:40",
+        "cardio_frequency": 125,
+        "latitude": 47.672567,
+        "longitude": -2.792567,
+        "altitude": 15
+      }
+    ],
+    "freq_min": 118,
+    "description": "Trail Run"
+  },
+  {
+    "date": "08/01/2023",
+    "freq_max": 102,
+    "distance": 500,
+    "data": [
+      {
+        "time": "14:00:00",
+        "cardio_frequency": 100,
+        "latitude": 47.680876,
+        "longitude": -2.800123,
+        "altitude": 10
+      },
+      {
+        "time": "14:00:10",
+        "cardio_frequency": 101,
+        "latitude": 47.681987,
+        "longitude": -2.801234,
+        "altitude": 10
+      },
+      {
+        "time": "14:00:20",
+        "cardio_frequency": 102,
+        "latitude": 47.683098,
+        "longitude": -2.802345,
+        "altitude": 10
+      }
+    ],
+    "freq_min": 99,
+    "description": "Short Walk"
+  }
+]

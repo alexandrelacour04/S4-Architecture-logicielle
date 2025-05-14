@@ -1,0 +1,5 @@
+fr\ubs\json\Main.class
+fr\ubs\sporttrack\model\Activity.class
+fr\ubs\sporttrack\model\JSONFileReader.class
+fr\ubs\sporttrack\model\JSONFileWriter.class
+fr\ubs\sporttrack\model\Data.class
