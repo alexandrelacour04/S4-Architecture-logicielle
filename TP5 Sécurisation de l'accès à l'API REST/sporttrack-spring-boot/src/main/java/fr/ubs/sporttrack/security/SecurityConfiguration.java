@@ -11,10 +11,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -41,7 +41,7 @@ public class SecurityConfiguration {
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
         UserDetails user = User
                 .withUsername(username)
-                .password(encoder.encode(password))
+                .password(password)
                 .roles("USER")
                 .build();
         return new InMemoryUserDetailsManager(user);
@@ -62,6 +62,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/openapi/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/activities/**", "/activities/").authenticated()
                         .requestMatchers(HttpMethod.POST, "/activities/").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/activities/clearDB", "/activities/{description}").authenticated()
                         .anyRequest().denyAll()
                 )
                 .httpBasic(withDefaults())
