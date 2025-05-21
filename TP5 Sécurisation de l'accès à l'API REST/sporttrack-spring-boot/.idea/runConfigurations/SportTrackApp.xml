@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SportTrackApp" type="CompoundRunConfigurationType">
+    <toRun name="Clean" type="MavenRunConfiguration" />
+    <toRun name="SportTrackApp" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

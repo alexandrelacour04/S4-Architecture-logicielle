@@ -11,3 +11,17 @@
 /TP2 MVVM avec le cadriciel ZK/sporttrack-webapp.tar.xz
 /TP3 REST avec Spring Boot/sporttrack.tar.gz
 /TP4 REST avec Spring Boot - spécification OpenAPI/sporttrack.tar.gz
+/TP5 Sécurisation de l'accès à l'API REST/.idea/
+/TP4 REST avec Spring Boot OpenAPI/.idea/
+/TP5 Sécurisation de l'accès à l'API REST/sporttrack-spring-boot/.idea/
+
+# Exclure tous les fichiers et dossiers nommés .idea
+.idea/
+
+# Exclure toutes les archives
+*.rar
+*.tar.gz
+*.tar.xz
+*.zip
+*.7z
+*.tgz
