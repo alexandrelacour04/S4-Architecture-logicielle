@@ -16,12 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-/**
- * Configuration class for application security settings.
- * Handles authentication, authorization and API documentation security.
- */
 @Configuration
 public class SecurityConfiguration {
 
@@ -32,10 +26,7 @@ public class SecurityConfiguration {
     private String password;
 
     /**
-     * Configures in-memory user details service with a single user.
-     *
-     * @param encoder Password encoder to hash user password
-     * @return InMemoryUserDetailsManager configured with user credentials
+     * Configure un utilisateur en mémoire avec identifiant/mot de passe stockés dans application.properties.
      */
     @Bean
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
@@ -48,33 +39,28 @@ public class SecurityConfiguration {
     }
 
     /**
-     * Configures HTTP security filter chain.
-     * Defines URL access patterns and authentication requirements.
-     *
-     * @param http HttpSecurity to be configured
-     * @return Configured SecurityFilterChain
-     * @throws Exception if an error occurs during configuration
+     * Configure les autorisations sur les URL et active HTTP Basic.
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/openapi/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/activities/**", "/activities/").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/activities/").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/activities/clearDB", "/activities/{description}").authenticated()
-                        .anyRequest().denyAll()
+                        .requestMatchers("/openapi/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Public pour Swagger
+                        .requestMatchers(HttpMethod.GET, "/activities/**").authenticated() // GET authentifié
+                        .requestMatchers(HttpMethod.POST, "/activities/").authenticated() // POST global
+                        .requestMatchers(HttpMethod.POST, "/activities/{description}").authenticated() // Ajouté pour POST sur {description}
+                        .requestMatchers(HttpMethod.DELETE, "/activities/**").authenticated() // DELETE autorisé
+                        .anyRequest().denyAll() // Bloquer les autres
                 )
-                .httpBasic(withDefaults())
-                .csrf(csrf -> csrf.disable());
+                .httpBasic()
+                .and()
+                .csrf().disable(); // Désactiver CSRF pour simplifier les tests
 
         return http.build();
     }
 
     /**
-     * Creates password encoder bean for secure password hashing.
-     *
-     * @return BCryptPasswordEncoder instance
+     * Ajoute un encodeur de mots de passe BCrypt.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -82,10 +68,7 @@ public class SecurityConfiguration {
     }
 
     /**
-     * Configures OpenAPI documentation with security schemes.
-     * Sets up basic authentication for Swagger UI.
-     *
-     * @return Configured OpenAPI instance
+     * Configure Swagger avec une authentification HTTP Basic.
      */
     @Bean
     public OpenAPI customOpenAPI() {
