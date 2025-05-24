@@ -62,6 +62,7 @@ public class ActivityController {
     })
     @GetMapping("/")
     public List<Activity> findAll() {
+        System.out.println("Get");
         try {
             String userHome = System.getProperty("user.home");
             String tempDataPath = userHome + "/.m2/repository/fr/ubs/sporttrack/model/1.0/temp-data.json";
@@ -77,6 +78,8 @@ public class ActivityController {
             if (!jarFile.exists()) {
                 throw new IllegalArgumentException("JAR du module `model` introuvable : " + jarPath);
             }
+
+            System.out.println("Get OK");
 
             try (JarFile jar = new JarFile(jarFile)) {
                 ZipEntry entry = jar.getEntry(DATA_FILE);

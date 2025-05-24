@@ -1,2 +1,3 @@
-fr\ubs\sporttrack\controller\ActivityController.class
 fr\ubs\sporttrack\SportTrackApp.class
+fr\ubs\sporttrack\security\SecurityConfiguration.class
+fr\ubs\sporttrack\controller\ActivityController.class
