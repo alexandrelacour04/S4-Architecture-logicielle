@@ -49,7 +49,7 @@ public class ActivityController {
      * Ajouter une activité.
      */
     @PostMapping("/")
-    public ResponseEntity<Map<String, String>> addActivity(@RequestBody Activity newActivity) {
+    public ResponseEntity<String> addActivity(@RequestBody Activity newActivity) {
         // Validation des données avec Hibernate Validator
         Set<ConstraintViolation<Activity>> violations = validator.validate(newActivity);
         if (!violations.isEmpty()) {
@@ -57,12 +57,12 @@ public class ActivityController {
                     .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                     .collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("error", errorMessage));
+                    .body("\"" + errorMessage + "\"");
         }
 
         if (newActivity == null || newActivity.getDescription() == null || newActivity.getDescription().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("error", "invalid data"));
+                    .body("\"unvalid data\"");
         }
 
         // Validation des données
@@ -70,7 +70,7 @@ public class ActivityController {
                 newActivity.getData().stream().anyMatch(d -> d.getCardioFrequency() < 0 || d.getCardioFrequency() > 250) ||
                 newActivity.getData().stream().anyMatch(d -> Math.abs(d.getLatitude()) > 90 || Math.abs(d.getLongitude()) > 180)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("error", "invalid data"));
+                    .body("\"unvalid data\"");
         }
 
         try {
@@ -83,18 +83,18 @@ public class ActivityController {
 
             if (exists) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(Collections.singletonMap("error", "duplicate activity"));
+                        .body("\"failure\"");
             }
 
             // Ajout de l'activité
             activities.add(newActivity);
             writeActivitiesToFile(activities);
 
-            return ResponseEntity.ok(Collections.singletonMap("result", "success"));
+            return ResponseEntity.ok("\"success\"");
         } catch (IOException e) {
             System.err.println("Erreur lors de l'écriture du fichier: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("error", "failure"));
+                    .body("\"failure\"");
         }
     }
 
@@ -102,14 +102,14 @@ public class ActivityController {
      * Supprimer toutes les activités.
      */
     @DeleteMapping("/")
-    public ResponseEntity<Map<String, String>> deleteAllActivities() {
+    public ResponseEntity<String> deleteAllActivities() {
         try {
             Files.writeString(new File(DATA_FILE).toPath(), "[]");
-            return ResponseEntity.ok(Collections.singletonMap("result", "success"));
+            return ResponseEntity.ok("\"success\"");
         } catch (IOException e) {
             System.err.println("Erreur lors de la suppression du fichier: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "failure"));
+                    .body("\"failure\"");
         }
     }
 
@@ -117,7 +117,7 @@ public class ActivityController {
      * Supprimer une activité spécifique par description.
      */
     @DeleteMapping("/{desc}")
-    public ResponseEntity<Map<String, String>> deleteActivity(@PathVariable String desc) {
+    public ResponseEntity<String> deleteActivity(@PathVariable String desc) {
         try {
             List<Activity> activities = readActivitiesFromFile();
 
@@ -125,15 +125,15 @@ public class ActivityController {
 
             if (removed) {
                 writeActivitiesToFile(activities);
-                return ResponseEntity.ok(Collections.singletonMap("result", "success"));
+                return ResponseEntity.ok("\"success\"");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonMap("error", "data does not exist"));
+                        .body("\"data does not exist\"");
             }
         } catch (IOException e) {
             System.err.println("Erreur lors de la suppression de l'activité: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "failure"));
+                    .body("\"failure\"");
         }
     }
 
@@ -141,9 +141,9 @@ public class ActivityController {
      * Gérer les appels POST non autorisés sur /activities/{description}.
      */
     @PostMapping("/{description}")
-    public ResponseEntity<Map<String, String>> unauthorizedOperation(@PathVariable String description) {
+    public ResponseEntity<String> unauthorizedOperation(@PathVariable String description) {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
-                .body(Collections.singletonMap("error", "unauthorized operation"));
+                .body("\"unauthorized operation\"");
     }
 
     /**
