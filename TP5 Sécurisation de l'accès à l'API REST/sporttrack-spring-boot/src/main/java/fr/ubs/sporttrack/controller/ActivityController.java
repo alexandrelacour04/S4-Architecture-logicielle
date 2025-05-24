@@ -37,7 +37,8 @@ public class ActivityController {
         try {
             List<Activity> activities = readActivitiesFromFile();
             activities.sort(Comparator.comparing(a -> a.getDescription().toLowerCase()));
-            return ResponseEntity.ok(activities);
+            System.out.println(activities);
+            return ResponseEntity.status(HttpStatus.OK).body(activities);
         } catch (IOException e) {
             System.err.println("Erreur lors de la lecture du fichier: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
