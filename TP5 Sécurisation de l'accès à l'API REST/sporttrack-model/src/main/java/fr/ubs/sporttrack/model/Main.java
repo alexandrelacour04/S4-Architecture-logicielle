@@ -27,8 +27,8 @@ public class Main{
 
             // add new data into the list
             List<Data> dataList = new ArrayList<>();
-            dataList.add(new Data("12:00:00", 120, 48.5f, -2.75f, 100.0f));
-            dataList.add(new Data("12:00:30", 125, 48.51f, -2.74f, 102.0f));
+            dataList.add(new Data("12:00:00", 120, 48.5f, -2.75f, 100));
+            dataList.add(new Data("12:00:30", 125, 48.51f, -2.74f, 102));
             activities.add(new Activity("2025-04-23", "test de bon fonctionnement", 1000, 110, 140, dataList));
 
             // store the list into the file

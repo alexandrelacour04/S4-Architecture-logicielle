@@ -14,11 +14,11 @@ public class Data {
     private int cardioFrequency;
     private float latitude;
     private float longitude;
-    private float altitude;
+    private int altitude;
     
     public Data(){}
     
-    public Data(String time, int cf, float lat, float lon, float alt){
+    public Data(String time, int cf, float lat, float lon, int alt){
         this.time = time;
         this.cardioFrequency = cf;
         this.latitude = lat;
@@ -47,7 +47,7 @@ public class Data {
     }
 
     public static Data fromJSON(JSONObject obj){
-        return new Data(obj.getString(TIME_FIELD), obj.getInt(CARDIO_FREQ_FIELD), obj.getFloat(LATITUDE_FIELD), obj.getFloat(LONGITUDE_FIELD), obj.getFloat(ALTITUDE_FIELD));
+        return new Data(obj.getString(TIME_FIELD), obj.getInt(CARDIO_FREQ_FIELD), obj.getFloat(LATITUDE_FIELD), obj.getFloat(LONGITUDE_FIELD), obj.getInt(ALTITUDE_FIELD));
     }
 
     public JSONObject toJSON(){
