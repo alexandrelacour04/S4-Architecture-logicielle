@@ -2,7 +2,6 @@ package fr.ubs.sporttrack.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ubs.sporttrack.model.Activity;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -13,8 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @RestController
 @RequestMapping("/activities")
