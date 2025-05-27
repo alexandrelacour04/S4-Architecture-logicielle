@@ -25,7 +25,7 @@ public class Data {
     @Max(value = 180, message = "La longitude maximale est 180")
     private float longitude;
 
-    private int altitude;
+    private double altitude;
 
     public Data() {
     }
@@ -54,7 +54,7 @@ public class Data {
         return this.longitude;
     }
 
-    public float getAltitude() {
+    public double getAltitude() {
         return this.altitude;
     }
 
