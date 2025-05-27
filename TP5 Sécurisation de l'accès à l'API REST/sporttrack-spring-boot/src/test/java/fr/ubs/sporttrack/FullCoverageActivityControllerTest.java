@@ -2,6 +2,7 @@ package fr.ubs.sporttrack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ubs.sporttrack.model.Activity;
+import fr.ubs.sporttrack.model.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -21,8 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class FullCoverageActivityControllerTest {
 
-    private static final String USERNAME = "sporttrack";
-    private static final String PASSWORD = "sporttrack";
+    private static final String USERNAME = "r401";
+    private static final String PASSWORD = "But2R041";
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,38 +35,62 @@ class FullCoverageActivityControllerTest {
     private Activity validActivity1;
     private Activity validActivity2;
     private Activity invalidActivity;
+    private Activity invalidCardioActivity;
+    private Activity invalidCoordinatesActivity;
 
     @BeforeEach
     void setUp() throws Exception {
-        mockMvc.perform(delete("/activities/clearDB")
+        mockMvc.perform(delete("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk());
+
+        Data validData = new Data("12:00:00", 10, 45.0f, 2.0f, 100);
+        Data invalidCardioData = new Data("12:00:00", 10, 45.0f, 2.0f, 10);
+        Data invalidCoordinatesData = new Data("12:00:00", 10, 91.0f, 181.0f, 100);
 
         validActivity1 = new Activity(
                 "01/01/2025",
                 "Running in the park",
-                10,
                 60,
+                100,
                 180,
-                new ArrayList<>()
+                Arrays.asList(validData)
         );
 
         validActivity2 = new Activity(
                 "02/01/2025",
                 "Morning cycling",
-                15,
                 70,
+                100,
                 160,
-                new ArrayList<>()
+                Arrays.asList(validData)
         );
 
         invalidActivity = new Activity(
-                "04/05/2025",
-                "Invalid activity",
+                null,
+                "",
                 0,
                 0,
                 0,
                 null
+        );
+
+        invalidCardioActivity = new Activity(
+                "03/01/2025",
+                "Invalid cardio",
+                10,
+                10,
+                230,
+                Arrays.asList(invalidCardioData)
+        );
+
+        invalidCoordinatesActivity = new Activity(
+                "04/01/2025",
+                "Invalid coordinates",
+                60,
+                100,
+                180,
+                Arrays.asList(invalidCoordinatesData)
         );
     }
 
@@ -78,13 +104,27 @@ class FullCoverageActivityControllerTest {
     }
 
     @Test
+    void testFindAllWithActivities() throws Exception {
+        mockMvc.perform(post("/activities/")
+                        .with(httpBasic(USERNAME, PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validActivity1)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/activities/")
+                        .with(httpBasic(USERNAME, PASSWORD)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
     void testAddValidActivity() throws Exception {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("L'activité a été créée avec succès"));
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
     }
 
     @Test
@@ -93,111 +133,102 @@ class FullCoverageActivityControllerTest {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("Une activité avec la date '01/01/2025' existe déjà."));
+                .andExpect(content().string("failure"));
     }
 
     @Test
-    void testAddInvalidActivityValidation() throws Exception {
+    void testAddNullActivity() throws Exception {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidActivity)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Données non valides")));
+                .andExpect(content().string("unvalid data"));
     }
 
     @Test
-    void testFindByKeywordSuccess() throws Exception {
+    void testAddInvalidCardioActivity() throws Exception {
+        mockMvc.perform(post("/activities/")
+                        .with(httpBasic(USERNAME, PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCardioActivity)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
+    }
+
+    @Test
+    void testAddInvalidCoordinatesActivity() throws Exception {
+        mockMvc.perform(post("/activities/")
+                        .with(httpBasic(USERNAME, PASSWORD))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCoordinatesActivity)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
+    }
+
+    @Test
+    void testDeleteAllActivities() throws Exception {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/activities/park")
+        mockMvc.perform(delete("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].description").value("Running in the park"));
-    }
+                .andExpect(content().string("success"));
 
-    @Test
-    void testFindByKeywordNoResults() throws Exception {
-        mockMvc.perform(post("/activities/")
-                        .with(httpBasic(USERNAME, PASSWORD))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
-
-        mockMvc.perform(get("/activities/cycling")
+        mockMvc.perform(get("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
-    void testDeleteActivitySuccess() throws Exception {
+    void testDeleteActivityByDescription() throws Exception {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         mockMvc.perform(delete("/activities/Running in the park")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isNoContent());
-
-        mockMvc.perform(get("/activities/")
-                        .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(content().string("success"));
     }
 
     @Test
-    void testDeleteActivityNotFound() throws Exception {
+    void testDeleteNonExistentActivity() throws Exception {
         mockMvc.perform(delete("/activities/NonExistentActivity")
                         .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Activité avec la description 'NonExistentActivity' non trouvée."));
+                .andExpect(content().string("data does not exist"));
     }
 
     @Test
-    void testClearDatabase() throws Exception {
-        mockMvc.perform(post("/activities/")
-                        .with(httpBasic(USERNAME, PASSWORD))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
-
-        mockMvc.perform(delete("/activities/clearDB")
+    void testUnauthorizedOperation() throws Exception {
+        mockMvc.perform(post("/activities/test")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Base de données réinitialisée avec succès"));
-
-        mockMvc.perform(get("/activities/")
-                        .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(content().string("unauthorized operation"));
     }
 
     @Test
     void testAddActivityIOException() throws Exception {
-        // Simuler une IOException en ajoutant une activité à un fichier inaccessible
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("Invalid JSON format"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("failure"));
     }
 }

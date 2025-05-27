@@ -2,6 +2,13 @@ package fr.ubs.sporttrack.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ubs.sporttrack.model.Activity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -18,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/activities")
+@Tag(name = "Activity Controller", description = "API endpoints for managing activities")
 public class ActivityController {
 
     private static final String DATA_FILE = "data.json";
@@ -29,6 +37,13 @@ public class ActivityController {
         this.validator = factory.getValidator();
     }
 
+    @Operation(summary = "Get all activities", description = "Retrieves all activities sorted by description")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Activities found",
+                    content = @Content(schema = @Schema(implementation = Activity.class))),
+            @ApiResponse(responseCode = "200", description = "No activities found (empty list)",
+                    content = @Content(schema = @Schema(implementation = ArrayList.class)))
+    })
     @GetMapping("/")
     public ResponseEntity<List<Activity>> findAll() {
         try {
@@ -41,14 +56,21 @@ public class ActivityController {
         }
     }
 
+    @Operation(summary = "Add a new activity", description = "Creates a new activity if it doesn't already exist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Activity successfully added"),
+            @ApiResponse(responseCode = "400", description = "Invalid activity data"),
+            @ApiResponse(responseCode = "409", description = "Activity with this description already exists")
+    })
     @PostMapping("/")
-    public ResponseEntity<String> addActivity(@RequestBody Activity newActivity) {
+    public ResponseEntity<String> addActivity(
+            @Parameter(description = "Activity to add", required = true)
+            @RequestBody Activity newActivity) {
         if (newActivity == null || newActivity.getDescription() == null || newActivity.getDescription().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("unvalid data");
         }
 
-        // Validation des données
         if (newActivity.getFreqMin() < 15 || newActivity.getFreqMax() > 220 ||
                 newActivity.getData().stream().anyMatch(d -> d.getCardioFrequency() < 15 || d.getCardioFrequency() > 220) ||
                 newActivity.getData().stream().anyMatch(d -> Math.abs(d.getLatitude()) > 90 || Math.abs(d.getLongitude()) > 180)) {
@@ -79,6 +101,11 @@ public class ActivityController {
         }
     }
 
+    @Operation(summary = "Delete all activities", description = "Removes all existing activities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All activities successfully deleted"),
+            @ApiResponse(responseCode = "500", description = "Internal server error while deleting activities")
+    })
     @DeleteMapping("/")
     public ResponseEntity<String> deleteAllActivities() {
         try {
@@ -91,8 +118,16 @@ public class ActivityController {
         }
     }
 
+    @Operation(summary = "Delete activity by description", description = "Removes a specific activity identified by its description")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Activity successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "Activity not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error while deleting activity")
+    })
     @DeleteMapping("/{desc}")
-    public ResponseEntity<String> deleteActivity(@PathVariable String desc) {
+    public ResponseEntity<String> deleteActivity(
+            @Parameter(description = "Description of the activity to delete", required = true)
+            @PathVariable String desc) {
         try {
             List<Activity> activities = readActivitiesFromFile();
 
@@ -112,8 +147,14 @@ public class ActivityController {
         }
     }
 
+    @Operation(summary = "Unauthorized operation", description = "This endpoint always returns method not allowed")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "405", description = "Method not allowed for this operation")
+    })
     @PostMapping("/{description}")
-    public ResponseEntity<String> unauthorizedOperation(@PathVariable String description) {
+    public ResponseEntity<String> unauthorizedOperation(
+            @Parameter(description = "Description parameter (not used)", required = true)
+            @PathVariable String description) {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body("unauthorized operation");
     }

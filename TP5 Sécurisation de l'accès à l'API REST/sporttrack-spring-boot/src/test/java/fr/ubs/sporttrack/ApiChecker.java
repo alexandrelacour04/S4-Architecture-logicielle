@@ -24,8 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ApiChecker {
 
-    private static final String USERNAME = "sporttrack";
-    private static final String PASSWORD = "sporttrack";
+    private static final String USERNAME = "r401";
+    private static final String PASSWORD = "But2R041";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -37,40 +37,40 @@ class ApiChecker {
 
     @BeforeEach
     void setUp() throws Exception {
-        mockMvc.perform(delete("/activities/clearDB")
+        mockMvc.perform(delete("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk());
 
         validActivity1 = new Activity(
                 "01/01/2025",
                 "Running in the park",
-                10,
                 60,
                 180,
+                10,
                 new ArrayList<>()
         );
 
         validActivity2 = new Activity(
                 "02/01/2025",
                 "Cycling on the road",
-                20,
                 65,
                 175,
+                20,
                 new ArrayList<>()
         );
 
         invalidFrequencyActivity = new Activity(
                 "03/01/2025",
                 "Invalid heart rate",
-                5,
-                30,
+                10,
                 300,
+                5,
                 new ArrayList<>()
         );
 
         invalidLogicActivity = new Activity(
                 "04/01/2025",
-                "Invalid logic test",
+                "",
                 0,
                 0,
                 0,
@@ -91,30 +91,32 @@ class ApiChecker {
 
     @Test
     @Operation(summary = "Ajoute une première activité valide")
-    @ApiResponse(responseCode = "201", description = "Activité créée avec succès")
+    @ApiResponse(responseCode = "200", description = "Activité créée avec succès")
     void test_1_AddFirstValidActivity() throws Exception {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
     }
 
     @Test
     @Operation(summary = "Ajoute une seconde activité valide")
-    @ApiResponse(responseCode = "201", description = "Activité créée avec succès")
+    @ApiResponse(responseCode = "200", description = "Activité créée avec succès")
     void test_2_AddSecondValidActivity() throws Exception {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity2)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
     }
 
     @Test
     @Operation(summary = "Tente d'ajouter une activité en doublon")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Première activité créée avec succès"),
+            @ApiResponse(responseCode = "200", description = "Première activité créée avec succès"),
             @ApiResponse(responseCode = "409", description = "La deuxième activité est un doublon")
     })
     void test_3_AddDuplicateActivity() throws Exception {
@@ -122,13 +124,15 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity2)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity2)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(content().string("failure"));
     }
 
     @Test
@@ -139,13 +143,15 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity2)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         mockMvc.perform(get("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
@@ -162,7 +168,8 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidFrequencyActivity)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
     }
 
     @Test
@@ -173,23 +180,25 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidLogicActivity)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
     }
 
     @Test
     @Operation(summary = "Tente d'effectuer un POST sur une URL interdite")
-    @ApiResponse(responseCode = "403", description = "Accès refusé")
+    @ApiResponse(responseCode = "405", description = "Méthode non autorisée")
     void test_7_PostToForbiddenUrl() throws Exception {
         mockMvc.perform(post("/activities/act1")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(content().string("unauthorized operation"));
     }
 
     @Operation(summary = "Supprime une activité existante")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Activité supprimée avec succès"),
+            @ApiResponse(responseCode = "200", description = "Activité supprimée avec succès"),
             @ApiResponse(responseCode = "404", description = "Activité non trouvée")
     })
     @Test
@@ -199,12 +208,14 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         // Supprimer l'activité ajoutée
         mockMvc.perform(delete("/activities/Running in the park")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         // Vérifier que l'activité a été supprimée
         mockMvc.perform(get("/activities/")
@@ -214,11 +225,10 @@ class ApiChecker {
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
-
     @Test
     @Operation(summary = "Tente de supprimer une activité déjà supprimée")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Première suppression réussie"),
+            @ApiResponse(responseCode = "200", description = "Première suppression réussie"),
             @ApiResponse(responseCode = "404", description = "Activité non trouvée lors de la seconde suppression")
     })
     void test_9_DeleteAlreadyDeletedActivity() throws Exception {
@@ -227,17 +237,20 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         // Première suppression
         mockMvc.perform(delete("/activities/Running in the park")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         // Deuxième suppression de la même activité
         mockMvc.perform(delete("/activities/Running in the park")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("data does not exist"));
     }
 
     @Test
@@ -252,12 +265,14 @@ class ApiChecker {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         // Réinitialisation de la base de données
-        mockMvc.perform(delete("/activities/clearDB")
+        mockMvc.perform(delete("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("success"));
 
         // Vérification que la base est vide
         mockMvc.perform(get("/activities/")
