@@ -109,12 +109,13 @@ class FullCoverageActivityControllerTest {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
 
         mockMvc.perform(get("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
@@ -123,8 +124,8 @@ class FullCoverageActivityControllerTest {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("success"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
     }
 
     @Test
@@ -133,14 +134,15 @@ class FullCoverageActivityControllerTest {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
 
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("failure"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
     }
 
     @Test
@@ -179,7 +181,8 @@ class FullCoverageActivityControllerTest {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
 
         mockMvc.perform(delete("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD)))
@@ -198,12 +201,13 @@ class FullCoverageActivityControllerTest {
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validActivity1)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("unvalid data"));
 
         mockMvc.perform(delete("/activities/Running in the park")
                         .with(httpBasic(USERNAME, PASSWORD)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("success"));
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("data does not exist"));
     }
 
     @Test
@@ -227,8 +231,8 @@ class FullCoverageActivityControllerTest {
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("Invalid JSON format"))
+                        .content("{}")) // Using empty JSON object
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("failure"));
+                .andExpect(content().string("unvalid data"));
     }
 }

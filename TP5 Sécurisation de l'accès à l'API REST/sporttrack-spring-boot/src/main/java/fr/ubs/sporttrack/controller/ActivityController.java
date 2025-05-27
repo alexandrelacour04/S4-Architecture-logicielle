@@ -60,12 +60,21 @@ public class ActivityController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Activity successfully added"),
             @ApiResponse(responseCode = "400", description = "Invalid activity data"),
+            @ApiResponse(responseCode = "405", description = "Method not allowed"),
             @ApiResponse(responseCode = "409", description = "Activity with this description already exists")
     })
-    @PostMapping("/")
+    @PostMapping({"/{description}", "/"})
     public ResponseEntity<String> addActivity(
             @Parameter(description = "Activity to add", required = true)
-            @RequestBody Activity newActivity) {
+            @RequestBody(required = false) Activity newActivity,
+            @Parameter(description = "Description parameter (optional)")
+            @PathVariable(required = false) String description) {
+
+        if (description != null) {
+            return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                    .body("unauthorized operation");
+        }
+
         if (newActivity == null || newActivity.getDescription() == null || newActivity.getDescription().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("unvalid data");
@@ -145,18 +154,6 @@ public class ActivityController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("failure");
         }
-    }
-
-    @Operation(summary = "Unauthorized operation", description = "This endpoint always returns method not allowed")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "405", description = "Method not allowed for this operation")
-    })
-    @PostMapping("/{description}")
-    public ResponseEntity<String> unauthorizedOperation(
-            @Parameter(description = "Description parameter (not used)", required = true)
-            @PathVariable String description) {
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
-                .body("unauthorized operation");
     }
 
     private List<Activity> readActivitiesFromFile() throws IOException {

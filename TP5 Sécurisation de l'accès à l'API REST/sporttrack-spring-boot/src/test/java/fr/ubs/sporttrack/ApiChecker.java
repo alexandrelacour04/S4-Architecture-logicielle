@@ -164,6 +164,15 @@ class ApiChecker {
     @Operation(summary = "Tente d'ajouter une activité avec une fréquence invalide")
     @ApiResponse(responseCode = "400", description = "Données non valides")
     void test_5_AddInvalidFrequencyActivity() throws Exception {
+        invalidFrequencyActivity = new Activity(
+                "03/01/2025",
+                "Invalid heart rate",
+                10,
+                5, // freq_min
+                300, // freq_max
+                new ArrayList<>()
+        );
+
         mockMvc.perform(post("/activities/")
                         .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
