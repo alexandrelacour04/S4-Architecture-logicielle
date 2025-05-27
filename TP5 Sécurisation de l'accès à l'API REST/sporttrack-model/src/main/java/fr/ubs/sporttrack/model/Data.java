@@ -1,7 +1,8 @@
 package fr.ubs.sporttrack.model;
 
 import org.json.JSONObject;
-
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 
 public class Data {
     private static final String TIME_FIELD = "time";
@@ -11,14 +12,25 @@ public class Data {
     private static final String ALTITUDE_FIELD = "altitude";
 
     private String time;
+
+    @Min(value = 15, message = "La fréquence cardiaque minimale est 15")
+    @Max(value = 220, message = "La fréquence cardiaque maximale est 220")
     private int cardioFrequency;
+
+    @Min(value = -90, message = "La latitude minimale est -90")
+    @Max(value = 90, message = "La latitude maximale est 90")
     private float latitude;
+
+    @Min(value = -180, message = "La longitude minimale est -180")
+    @Max(value = 180, message = "La longitude maximale est 180")
     private float longitude;
+
     private int altitude;
-    
-    public Data(){}
-    
-    public Data(String time, int cf, float lat, float lon, int alt){
+
+    public Data() {
+    }
+
+    public Data(String time, int cf, float lat, float lon, int alt) {
         this.time = time;
         this.cardioFrequency = cf;
         this.latitude = lat;
@@ -26,31 +38,31 @@ public class Data {
         this.altitude = alt;
     }
 
-    public String getTime(){
+    public String getTime() {
         return this.time;
     }
 
-    public int getCardioFrequency(){
+    public int getCardioFrequency() {
         return this.cardioFrequency;
     }
 
-    public float getLatitude(){
+    public float getLatitude() {
         return this.latitude;
     }
 
-    public float getLongitude(){
+    public float getLongitude() {
         return this.longitude;
     }
 
-    public float getAltitude(){
+    public float getAltitude() {
         return this.altitude;
     }
 
-    public static Data fromJSON(JSONObject obj){
+    public static Data fromJSON(JSONObject obj) {
         return new Data(obj.getString(TIME_FIELD), obj.getInt(CARDIO_FREQ_FIELD), obj.getFloat(LATITUDE_FIELD), obj.getFloat(LONGITUDE_FIELD), obj.getInt(ALTITUDE_FIELD));
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject obj = new JSONObject();
         obj.put(TIME_FIELD, this.time);
         obj.put(CARDIO_FREQ_FIELD, this.cardioFrequency);
@@ -61,7 +73,7 @@ public class Data {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return this.toJSON().toString();
     }
 }

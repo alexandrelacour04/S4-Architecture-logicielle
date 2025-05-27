@@ -28,7 +28,7 @@ import java.util.List;
 @Tag(name = "Activity Controller", description = "API endpoints for managing activities")
 public class ActivityController {
 
-    private static final String DATA_FILE = "data.json";
+    private static final String DATA_FILE = "src/main/java/fr/ubs/sporttrack/data/data.json";
     private final Validator validator;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
